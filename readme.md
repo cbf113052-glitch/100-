@@ -7,4 +7,3 @@
 1. **複製儲存庫**
    ```bash
    git clone [https://github.com/cbf113052-glitch/100-.git](https://github.com/cbf113052-glitch/100-.git)
-   cd mysite
