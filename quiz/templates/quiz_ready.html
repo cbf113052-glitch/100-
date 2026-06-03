@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>準備開始挑戰</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        body {
+            background-color: #0F172A;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #F8FAFC;
+            background-image: 
+                linear-gradient(rgba(168, 85, 247, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168, 85, 247, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="max-w-md w-full glass-panel rounded-[32px] p-8 text-center relative overflow-hidden shadow-2xl">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl -z-10"></div>
+        
+        <div class="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mx-auto text-2xl mb-6 border border-purple-500/30">
+            <i class="fas fa-brain"></i>
+        </div>
+
+        <h1 class="text-2xl font-bold text-white mb-2">設定你的挑戰規模</h1>
+        <p class="text-gray-400 text-sm mb-8">請選擇本次測驗的題目數量，系統將依據間隔學習算法為你隨機派題與複習錯題。</p>
+
+        <div class="space-y-4">
+            <a href="{% url 'quiz_view' %}?num=5" 
+               class="group block p-5 rounded-2xl bg-slate-800/50 border border-gray-700 hover:border-purple-500/50 transition-all text-left relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-white font-bold group-hover:text-purple-400 transition-colors">⚡ 快速核心挑戰 (5 題)</p>
+                        <p class="text-gray-400 text-xs mt-1">適合快速複習觀念與高頻錯題（配分：每題 20 分）</p>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-500 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+
+            <a href="{% url 'quiz_view' %}?num=10" 
+               class="group block p-5 rounded-2xl bg-slate-800/50 border border-gray-700 hover:border-purple-500/50 transition-all text-left relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-white font-bold group-hover:text-purple-400 transition-colors">🏆 深度綜合評測 (10 題)</p>
+                        <p class="text-gray-400 text-xs mt-1">完整難易度池抽樣，進行全方位深度檢測（配分：每題 10 分）</p>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-500 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-gray-800">
+            <a href="{% url 'dashboard' %}" class="text-xs text-gray-500 hover:text-gray-400 transition-colors">
+                <i class="fas fa-arrow-left mr-1"></i> 返回主控制台
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

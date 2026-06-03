@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>測驗</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        body {
+            background-color: #0F172A;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #F8FAFC;
+            background-image: 
+                linear-gradient(rgba(168, 85, 247, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168, 85, 247, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-attachment: fixed;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            transition: all 0.3s ease;
+        }
+        .glass-panel:focus-within {
+            border-color: #A855F7;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+        }
+        .option-input:checked + .option-label {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: #A855F7;
+            color: white;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* 側邊快速跳題 */
+        .jump-dot:hover { background: #A855F7; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="fixed top-0 left-0 w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-gray-800 p-4">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="font-bold tracking-tighter text-xl">CYBER<span class="text-purple-500">PQ</span></div>
+            <div class="flex items-center gap-6">
+                <div class="text-sm text-gray-400">當前進度: <span class="text-purple-400 font-mono">10 / 10 題</span></div>
+                <div class="bg-slate-950 px-4 py-1.5 rounded-lg border border-purple-500/50 text-purple-400 font-mono">
+                    <i class="far fa-clock mr-2"></i>29:55
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-3xl mx-auto mt-24 mb-20 space-y-8">
+        
+        <div class="glass-panel rounded-3xl p-8" id="q1">
+            <div class="flex justify-between mb-4">
+                <span class="text-purple-400 font-bold text-xs tracking-widest uppercase">Question 01</span>
+                <span class="text-gray-600 text-xs">Score: 10</span>
+            </div>
+            <h3 class="text-lg font-semibold mb-6">在一個最小堆積 (Min-Heap) 中，根節點的值必定是？</h3>
+            <div class="space-y-3">
+                <label class="block cursor-pointer">
+                    <input type="radio" name="q1" class="hidden option-input">
+                    <div class="option-label p-4 rounded-xl border border-gray-700 bg-slate-800/40 hover:border-gray-500 transition-all">A. 整個堆積中的最大值</div>
+                </label>
+                <label class="block cursor-pointer">
+                    <input type="radio" name="q1" class="hidden option-input">
+                    <div class="option-label p-4 rounded-xl border border-gray-700 bg-slate-800/40 hover:border-gray-500 transition-all text-white">B. 整個堆積中的最小值</div>
+                </label>
+                <label class="block cursor-pointer">
+                    <input type="radio" name="q1" class="hidden option-input">
+                    <div class="option-label p-4 rounded-xl border border-gray-700 bg-slate-800/40 hover:border-gray-500 transition-all">C. 隨機數值</div>
+                </label>
+                <label class="block cursor-pointer">
+                    <input type="radio" name="q1" class="hidden option-input">
+                    <div class="option-label p-4 rounded-xl border border-gray-700 bg-slate-800/40 hover:border-gray-500 transition-all">C. 隨機數值</div>
+                </label>
+            </div>
+        </div>
+
+        <div class="glass-panel rounded-3xl p-8" id="q2">
+            <div class="flex justify-between mb-4">
+                <span class="text-purple-400 font-bold text-xs tracking-widest uppercase text-blue-400">Question 02 (多選)</span>
+            </div>
+            <h3 class="text-lg font-semibold mb-6">下列哪些關於 Priority Queue 的敘述是正確的？(複選)</h3>
+            <div class="space-y-3">
+                <label class="block cursor-pointer">
+                    <input type="checkbox" name="q2" class="hidden option-input">
+                    <div class="option-label p-4 rounded-xl border border-gray-700 bg-slate-800/40 hover:border-gray-500 transition-all">A. 可以使用陣列實作</div>
+                </label>
+                <label class="block cursor-pointer">
+                    <input type="checkbox" name="q2" class="hidden option-input">
+                    <div class="option-label p-4 rounded-xl border border-gray-700 bg-slate-800/40 hover:border-gray-500 transition-all">B. 元素的取出順序與進入順序無關，僅與優先權有關</div>
+                </label>
+                <label class="block cursor-pointer">
+                    <input type="checkbox" name="q2" class="hidden option-input">
+                    <div class="option-label p-4 rounded-xl border border-gray-700 bg-slate-800/40 hover:border-gray-500 transition-all">C. 只能用鏈結串列實作</div>
+                </label>
+                <label class="block cursor-pointer">
+                    <input type="radio" name="q1" class="hidden option-input">
+                    <div class="option-label p-4 rounded-xl border border-gray-700 bg-slate-800/40 hover:border-gray-500 transition-all">C. 隨機數值</div>
+                </label>
+            </div>
+        </div>
+
+        <div class="py-10 text-center text-gray-500 italic text-sm">
+            --- 已到達試卷底部 ---
+        </div>
+
+        <div class="pt-6 pb-20">
+            <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-5 rounded-2xl shadow-[0_0_30px_rgba(168,85,247,0.3)] transition-all transform active:scale-[0.98] text-xl">
+                確認答案並交卷 (Submit Exam)
+            </button>
+            <p class="text-center text-gray-500 text-xs mt-4">交卷後將無法修改答案，系統將立即進行自動評分。</p>
+        </div>
+
+    </main>
+
+    <div class="hidden lg:flex fixed right-10 top-1/2 -translate-y-1/2 flex-col gap-2">
+        <div class="text-[10px] text-gray-500 mb-2 font-mono">NAVIGATOR</div>
+        <a href="#q1" class="w-8 h-8 rounded bg-purple-500 text-white flex items-center justify-center text-xs font-bold">1</a>
+        <a href="#q2" class="w-8 h-8 rounded border border-gray-700 text-gray-400 flex items-center justify-center text-xs hover:border-purple-500">2</a>
+        <div class="w-8 h-8 rounded border border-gray-800 flex items-center justify-center text-gray-700 text-[8px]">...</div>
+        <a href="#q10" class="w-8 h-8 rounded border border-gray-700 text-gray-400 flex items-center justify-center text-xs">10</a>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歷史紀錄</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        body {
+            background-color: #0F172A;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #F8FAFC;
+            background-image: 
+                linear-gradient(rgba(168, 85, 247, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168, 85, 247, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-attachment: fixed;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .record-row:hover {
+            background: rgba(168, 85, 247, 0.05);
+        }
+    </style>
+</head>
+<body class="p-6 md:p-10">
+
+    <div class="max-w-5xl mx-auto">
+        <div class="mb-8">
+            <a href="/dashboard/" class="glass-panel inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold text-gray-300 hover:text-white hover:border-purple-500/50 transition-all group">
+                <i class="fas fa-home text-purple-500 group-hover:scale-110 transition-transform"></i>
+                主畫面
+            </a>
+        </div>
+
+        <div class="mb-10 text-center">
+            <h1 class="text-3xl font-bold tracking-tight text-white">測驗歷史紀錄</h1>
+            <p class="text-gray-400 mt-2">追蹤你過去所有的挑戰紀錄，掌握學習曲線與答題成效。</p>
+        </div>
+
+        <div class="flex justify-start mb-8">
+            <div class="glass-panel p-5 rounded-2xl w-full md:w-64">
+                <p class="text-[10px] text-gray-500 uppercase tracking-wider">總測驗次數</p>
+                <p class="text-2xl font-bold text-purple-400 font-mono mt-1">
+                    {{ total_count }} <span class="text-xs text-gray-500 font-normal">次</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="glass-panel rounded-[32px] overflow-hidden">
+            <div class="p-6 bg-slate-800/40 border-b border-gray-700 flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white">歷次挑戰清單</h3>
+                <span class="text-xs text-gray-500 font-mono">ORDER BY DATE DESC</span>
+            </div>
+            
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-800/80 border-b border-gray-700">
+                        <th class="p-6 text-xs font-bold uppercase tracking-wider text-gray-400">測驗日期</th>
+                        <th class="p-6 text-xs font-bold uppercase tracking-wider text-gray-400">測驗範圍 / 標題</th>
+                        <th class="p-6 text-xs font-bold uppercase tracking-wider text-gray-400 text-center">結果狀態</th>
+                        <th class="p-6 text-xs font-bold uppercase tracking-wider text-gray-400">得分/答對率</th>
+                        <th class="p-6 text-xs font-bold uppercase tracking-wider text-gray-400 text-center">詳細分析</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-800">
+                    {% for history in history_list %}
+                    <tr class="record-row transition-colors">
+                        <td class="p-6 mono text-gray-400 text-sm">{{ history.created_at|date:"Y-m-d H:i" }}</td>
+                        <td class="p-6">
+                            <p class="text-sm font-semibold text-gray-200">{{ history.title }}</p>
+                            <p class="text-xs text-gray-500 mt-1">{{ history.quiz_summary }}</p>
+                        </td>
+                        <td class="p-6 text-center">
+                            {% if history.status == 'PASS' %}
+                            <span class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/20">
+                                PASS
+                            </span>
+                            {% else %}
+                            <span class="bg-rose-500/10 text-rose-400 px-3 py-1 rounded-full text-xs font-bold border border-rose-500/20">
+                                FAIL
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="p-6">
+                            <span class="text-sm font-bold text-white font-mono">{{ history.score_percentage }}%</span>
+                            <span class="text-xs text-gray-500 font-mono ml-1">({{ history.score }}分)</span>
+                        </td>
+                        <td class="p-6 text-center">
+                            <a 
+                                href="{% url 'quiz_detail' history.id %}" 
+                                class="text-purple-400 hover:text-purple-300 text-sm transition-all p-2 inline-block hover:scale-110 transform duration-200"
+                                title="查看深度分析戰報"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="p-10 text-center text-gray-500 text-sm">
+                            目前尚無任何測驗挑戰紀錄。
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="p-6 bg-slate-900/30 border-t border-gray-800 text-center">
+                <button class="text-sm text-gray-500 hover:text-purple-400 transition-colors">
+                    查看更早的測驗紀錄 <i class="fas fa-chevron-down ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

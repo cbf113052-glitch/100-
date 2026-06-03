@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>核心題庫總覽 | 資料結構</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0f111a; color: #e2e8f0; }
+        .glass-card {
+            background: rgba(20, 24, 41, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+
+    <div class="max-w-4xl mx-auto px-4 py-10">
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-800">
+            <div class="flex items-center space-x-3">
+                <div class="p-3 bg-teal-600/20 rounded-xl text-teal-400 text-2xl">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-wide text-white">📚 核心題庫總覽</h1>
+                    <p class="text-sm text-gray-400 mt-1">自主複習模式：預設隱藏答案，點擊 👁️ 即可查看詳解。難度完全由後端系統自動分類判定。</p>
+                </div>
+            </div>
+            <a href="/dashboard/" class="text-sm bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-xl transition duration-200">
+                <i class="fas fa-arrow-left mr-2"></i>返回控制台
+            </a>
+        </div>
+
+        <div class="space-y-6">
+            
+            {% for q in questions %}
+            <div class="glass-card p-6 rounded-2xl shadow-xl transition duration-300 hover:border-teal-500/30">
+                
+                <div class="flex flex-wrap gap-2 mb-3 items-center">
+                    {% if q.difficulty == 'easy' %}
+                        <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            <i class="fas fa-leaf mr-1"></i>難度：簡單
+                        </span>
+                    {% elif q.difficulty == 'medium' %}
+                        <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            <i class="fas fa-balance-scale mr-1"></i>難度：中等
+                        </span>
+                    {% else %}
+                        <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                            <i class="fas fa-fire mr-1"></i>難度：困難
+                        </span>
+                    {% endif %}
+
+                    {% if q.is_wrong_pool %}
+                        <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-rose-600/20 text-rose-300 border border-rose-500/30">
+                            <i class="fas fa-history mr-1"></i>已列錯題池 (連錯 {{ q.streak }} 次)
+                        </span>
+                        {% if q.cooldown <= 0 %}
+                            <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-blue-500 text-white animate-pulse shadow-lg shadow-blue-500/20">
+                                <i class="fas fa-bolt mr-1"></i>冷卻完畢 (下次測驗必出)
+                            </span>
+                        {% else %}
+                            <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700">
+                                <i class="fas fa-hourglass-half mr-1"></i>冷卻中 (餘 {{ q.cooldown }} 題)
+                            </span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-start space-x-3">
+                        <span class="flex items-center justify-center bg-teal-600 text-white font-bold rounded-lg px-2.5 py-1 text-xs mt-1 shrink-0">
+                            第 {{ forloop.counter }} 題
+                        </span>
+                        <h3 class="text-lg font-semibold text-gray-100 leading-relaxed">
+                            {{ q.question_text }}
+                        </h3>
+                    </div>
+                    
+                    <button onclick="toggleAnswer(this, 'panel_{{ q.id }}')" 
+                            class="p-2 text-gray-400 hover:text-teal-300 bg-gray-800 hover:bg-teal-500/10 rounded-xl transition duration-200 cursor-pointer text-lg ml-4 shrink-0">
+                        <i class="fas fa-eye-slash"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3 pl-2 mb-4">
+                    <div class="p-3 rounded-xl bg-gray-900/40 border border-gray-800/60 text-sm text-gray-300">
+                        <strong class="text-teal-400 mr-2">(A)</strong> {{ q.option_a }}
+                    </div>
+                    <div class="p-3 rounded-xl bg-gray-900/40 border border-gray-800/60 text-sm text-gray-300">
+                        <strong class="text-teal-400 mr-2">(B)</strong> {{ q.option_b }}
+                    </div>
+                    <div class="p-3 rounded-xl bg-gray-900/40 border border-gray-800/60 text-sm text-gray-300">
+                        <strong class="text-teal-400 mr-2">(C)</strong> {{ q.option_c }}
+                    </div>
+                    <div class="p-3 rounded-xl bg-gray-900/40 border border-gray-800/60 text-sm text-gray-300">
+                        <strong class="text-teal-400 mr-2">(D)</strong> {{ q.option_d }}
+                    </div>
+                    
+                    {% if q.option_e and q.option_e != "None" %}
+                    <div class="p-3 rounded-xl bg-gray-900/40 border border-gray-800/60 text-sm text-gray-300">
+                        <strong class="text-teal-400 mr-2">(E)</strong> {{ q.option_e }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div id="panel_{{ q.id }}" class="hidden mt-4 p-4 bg-teal-950/20 border border-teal-500/20 rounded-2xl space-y-2.5 animate-fade-in">
+                    <div class="flex items-center text-sm text-teal-300 font-bold">
+                        <i class="fas fa-check-circle mr-2 text-base"></i>
+                        <span>官方正確答案：<span class="text-white text-xs bg-teal-600 px-2 py-0.5 rounded ml-1 font-bold">{{ q.correct_answer }}</span></span>
+                    </div>
+                    
+                    <div class="text-xs text-gray-400 leading-relaxed pt-2 border-t border-teal-900/50 flex items-start">
+                        <i class="fas fa-book-reader mr-2 mt-0.5 text-teal-500 text-sm"></i>
+                        <div>
+                            <span class="text-teal-400 font-semibold block mb-0.5">題目解析：</span>
+                            {% if q.explanation %}
+                                {{ q.explanation }}
+                            {% else %}
+                                暫無此題目的詳細解析。
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            {% empty %}
+            <div class="glass-card p-10 rounded-2xl text-center border-dashed border-gray-700">
+                <h3 class="text-xl font-bold text-white mb-2">目前資料庫內沒有任何題目喔！</h3>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+    <script>
+        function toggleAnswer(button, panelId) {
+            const panel = document.getElementById(panelId);
+            const icon = button.querySelector('i');
+            
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                button.classList.remove('text-gray-400', 'bg-gray-800');
+                button.classList.add('text-teal-400', 'bg-teal-500/10');
+            } else {
+                panel.classList.add('hidden');
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                button.classList.remove('text-teal-400', 'bg-teal-500/10');
+                button.classList.add('text-gray-400', 'bg-gray-800');
+            }
+        }
+    </script>
+
+</body>
+</html>

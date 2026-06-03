@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>測驗深度診斷報告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        body {
+            background-color: #0F172A;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #F8FAFC;
+            background-image: 
+                linear-gradient(rgba(168, 85, 247, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168, 85, 247, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-attachment: fixed;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body class="p-6 md:p-10">
+
+    <div class="max-w-4xl mx-auto">
+        
+        <div class="mb-8">
+            <a href="/dashboard/history/" class="glass-panel inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold text-gray-300 hover:text-white hover:border-purple-500/50 transition-all group">
+                <i class="fas fa-arrow-left text-purple-500 group-hover:-translate-x-0.5 transition-transform"></i>
+                返回歷史紀錄
+            </a>
+        </div>
+
+        <div class="glass-panel rounded-[32px] p-8 mb-8 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl -z-10"></div>
+            
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <span class="bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full text-xs font-bold border border-purple-500/30">
+                        深度診斷報告
+                    </span>
+                    <h1 class="text-2xl font-bold mt-4 text-white">堆積與優先佇列綜合挑戰</h1>
+                    <div class="flex items-center gap-2 text-gray-400 text-sm mt-2 mono">
+                        <i class="far fa-clock"></i> 測驗時間：{{ result.created_at|date:"Y-m-d H:i:s" }}
+                    </div>
+                    <p class="mt-4 text-sm text-gray-300 leading-relaxed max-w-xl">
+                        <span class="text-purple-400 font-bold">AI 導師建議：</span>{{ feedback }}
+                    </p>
+                </div>
+
+                <div class="glass-panel bg-slate-900/50 p-6 rounded-2xl flex items-center gap-8 min-w-[240px] justify-center">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">答對率</p>
+                        <p class="text-4xl font-extrabold text-purple-400 font-mono mt-1">{{ result.score }}%</p>
+                    </div>
+                    <div class="w-px h-12 bg-gray-700"></div>
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">狀態</p>
+                        {% if result.score >= 60 %}
+                        <p class="text-emerald-400 font-bold text-lg mt-2 flex items-center gap-1">
+                            <i class="fas fa-check-circle"></i> 已通過
+                        </p>
+                        {% else %}
+                        <p class="text-rose-400 font-bold text-lg mt-2 flex items-center gap-1">
+                            <i class="fas fa-times-circle"></i> 未通過
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-panel rounded-[32px] overflow-hidden mb-8">
+            <div class="p-6 bg-slate-800/40 border-b border-gray-700 flex items-center gap-3">
+                <i class="fas fa-list-ol text-purple-400"></i>
+                <h3 class="font-bold text-lg text-white">答題考卷全紀錄</h3>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
+                    <div class="bg-slate-800/40 p-4 rounded-xl border border-gray-800">
+                        <p class="text-xs text-gray-500">答對題數</p>
+                        <p class="text-xl font-bold text-emerald-400 font-mono mt-1">{{ result.correct_count }} 題</p>
+                    </div>
+                    <div class="bg-slate-800/40 p-4 rounded-xl border border-gray-800">
+                        <p class="text-xs text-gray-500">答錯題數</p>
+                        <p class="text-xl font-bold text-rose-400 font-mono mt-1">{{ result.wrong_count }} 題</p>
+                    </div>
+                    <div class="bg-slate-800/40 p-4 rounded-xl border border-gray-800">
+                        <p class="text-xs text-gray-500">總配分</p>
+                        <p class="text-xl font-bold text-gray-300 font-mono mt-1">100 分</p>
+                    </div>
+                    <div class="bg-slate-800/40 p-4 rounded-xl border border-gray-800">
+                        <p class="text-xs text-gray-500">實得分數</p>
+                        <p class="text-xl font-bold text-purple-400 font-mono mt-1">{{ result.score }} 分</p>
+                    </div>
+                </div>
+
+                {% for q in questions %}
+                <div class="p-5 rounded-2xl border {% if q.is_correct %}border-emerald-500/20 bg-emerald-500/5{% else %}border-rose-500/20 bg-rose-500/5{% endif %}">
+                    <div class="flex items-start gap-3">
+                        <span class="font-mono font-bold text-sm {% if q.is_correct %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                            Q{{ forloop.counter }}.
+                        </span>
+                        <p class="text-gray-200 font-medium text-sm">{{ q.question_text }}</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4 ml-6 text-xs">
+                        {% if q.option_a and q.option_a != "None" %}
+                        <p class="{% if q.option_a == q.correct_answer_text %}text-emerald-400 font-semibold{% else %}text-gray-400{% endif %}">A. {{ q.option_a }}</p>
+                        {% endif %}
+                        
+                        {% if q.option_b and q.option_b != "None" %}
+                        <p class="{% if q.option_b == q.correct_answer_text %}text-emerald-400 font-semibold{% else %}text-gray-400{% endif %}">B. {{ q.option_b }}</p>
+                        {% endif %}
+                        
+                        {% if q.option_c and q.option_c != "None" %}
+                        <p class="{% if q.option_c == q.correct_answer_text %}text-emerald-400 font-semibold{% else %}text-gray-400{% endif %}">C. {{ q.option_c }}</p>
+                        {% endif %}
+                        
+                        {% if q.option_d and q.option_d != "None" %}
+                        <p class="{% if q.option_d == q.correct_answer_text %}text-emerald-400 font-semibold{% else %}text-gray-400{% endif %}">D. {{ q.option_d }}</p>
+                        {% endif %}
+                        
+                        {% if q.option_e and q.option_e != "None" %}
+                        <p class="{% if q.option_e == q.correct_answer_text %}text-emerald-400 font-semibold{% else %}text-gray-400{% endif %}">E. {{ q.option_e }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mt-4 ml-6 pt-3 border-t border-gray-800/60 flex items-center gap-6 text-xs">
+                        <p class="text-gray-400">你的答案：<span class="font-bold {% if q.is_correct %}text-emerald-400{% else %}text-rose-400{% endif %}">{{ q.user_answer_text }}</span></p>
+                        <p class="text-emerald-400">正確答案：<span class="font-bold">{{ q.correct_answer_text }}</span></p>
+                    </div>
+                    
+                    <div class="mt-3 ml-6 p-3 bg-slate-900/40 rounded-xl border border-gray-800 text-xs">
+                        <span class="text-purple-400 font-bold"><i class="fas fa-lightbulb mr-1"></i> 題目解析：</span>
+                        <span class="text-gray-400 leading-relaxed">{{ q.explanation }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-12 text-gray-500 text-sm bg-slate-900/20 rounded-2xl border border-dashed border-gray-800">
+                    <i class="fas fa-folder-open text-gray-600 text-2xl mb-3 block"></i>
+                    此測驗紀錄僅保存分數摘要，無細項題目紀錄。
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="text-center">
+            <a href="/dashboard/history/" class="glass-panel px-8 py-3 rounded-xl text-sm font-bold text-gray-300 hover:text-white hover:border-purple-500/50 transition-all inline-flex items-center gap-2">
+                確認完成，關閉戰報
+            </a>
+        </div>
+
+    </div>
+
+</body>
+</html>

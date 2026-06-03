@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>資結 堆積與優先佇列 | 控制台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-purple: #A855F7;
+            --bg-dark: #0F172A;
+            --card-bg: rgba(30, 41, 59, 0.7);
+        }
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #F8FAFC;
+            background-image: radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.1) 0%, transparent 80%);
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+        .sidebar-item {
+            transition: all 0.2s ease;
+            border-right: 4px solid transparent;
+        }
+        .sidebar-item:hover {
+            background: rgba(168, 85, 247, 0.1);
+            border-right: 4px solid var(--primary-purple);
+            color: #A855F7;
+        }
+        .active-sidebar {
+            background: rgba(168, 85, 247, 0.15);
+            border-right: 4px solid var(--primary-purple);
+            color: #A855F7;
+        }
+        /* 活動熱圖：滑鼠懸浮自訂提示 (Tooltip) */
+        .heatmap-cell {
+            position: relative;
+        }
+        .heatmap-cell::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: #1E293B;
+            color: #F1F5F9;
+            padding: 5px 9px;
+            font-size: 11px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.15s ease;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            z-index: 50;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .heatmap-cell:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+    </style>
+</head>
+<body class="flex">
+
+    <aside class="w-64 h-screen sticky top-0 border-r border-gray-800 bg-slate-900/50 flex flex-col">
+        <div class="p-8">
+            <h1 class="text-2xl font-bold tracking-tighter text-white">
+                資料<span class="text-purple-500">結構</span>
+            </h1>
+        </div>
+
+        <nav class="flex-grow mt-4 space-y-1">
+            <a href="{% url 'dashboard' %}" class="sidebar-item active-sidebar flex items-center px-8 py-4 font-semibold">
+                <i class="fas fa-th-large w-6"></i> 控制台
+            </a>
+            <a href="{% url 'quiz_ready' %}" class="sidebar-item flex items-center px-8 py-4 text-gray-400">
+                <i class="fas fa-edit w-6"></i> 開始測驗
+            </a>
+            <a href="{% url 'bank_page' %}" class="sidebar-item flex items-center px-8 py-4 text-gray-400">
+                <i class="fas fa-database w-6"></i> 題庫總覽
+            </a>
+            <a href="{% url 'quiz_history' %}" class="sidebar-item flex items-center px-8 py-4 text-gray-400">
+                <i class="fas fa-history w-6"></i> 歷史紀錄
+            </a>
+        </nav>
+
+        <div class="p-8 border-t border-gray-800">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center font-bold text-white shadow-lg">
+                    {{ request.user.username|slice:":1"|upper }}
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-white">{{ request.user.username }}</p>
+                    <p class="text-xs text-gray-500">Student ID: {{ request.user.id }}</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-grow p-8">
+        <header class="flex justify-between items-end mb-10">
+            <div>
+                <h2 class="text-3xl font-bold mb-2 tracking-tight">堆積與優先佇列</h2>
+                <p class="text-sm text-gray-400">歡迎回來，今天也來提升資料結構的實力吧！</p>
+            </div>
+        </header>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            
+            <div class="glass-panel p-6 rounded-3xl relative overflow-hidden group flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:scale-[1.02]">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
+                    <i class="fas fa-rocket text-6xl text-purple-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-2 flex items-center gap-2 text-white">
+                        <i class="fas fa-paper-plane text-purple-400 text-lg"></i> 線上測驗
+                    </h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">進行全方位實力自我檢測</p>
+                </div>
+                <a href="{% url 'quiz_ready' %}" class="block w-full mt-4">
+                    <button class="w-full py-3 bg-slate-800 hover:bg-purple-950/40 hover:text-purple-400 rounded-xl font-bold text-sm border border-purple-500/30 active:scale-95 transition-all duration-150 cursor-pointer text-center">
+                        進入測驗系統
+                    </button>
+                </a>
+            </div>
+
+            <div class="glass-panel p-6 rounded-3xl border border-rose-500/20 relative overflow-hidden group flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:scale-[1.02]">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
+                    <i class="fas fa-skull-crossbones text-6xl text-rose-500"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-rose-400 tracking-wide flex items-center mb-2">
+                        <i class="fas fa-bolt mr-2 text-rose-500"></i>錯題統計
+                    </h3>
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-300">
+                            你目前已累積了 <span class="text-rose-400 font-extrabold text-2xl mx-1 font-mono">{{ total_wrong|default:0 }}</span> 題弱點錯題。
+                        </p>
+                        <p class="text-xs text-gray-500 bg-slate-900/40 p-2 rounded-lg border border-gray-800">
+                            上次測驗得分：<span class="text-purple-400 font-semibold font-mono">{% if last_score is not None %}{{ last_score }}%{% else %}尚無紀錄{% endif %}</span>
+                        </p>
+                    </div>
+                </div>
+                <a href="{% url 'wrong_questions' %}" class="block w-full mt-4">
+                    <button class="w-full py-3 border border-rose-500/30 hover:border-rose-500/80 bg-rose-950/10 hover:bg-rose-500/20 text-rose-400 hover:text-white rounded-xl font-bold text-sm active:scale-95 transition-all duration-150 cursor-pointer text-center">
+                        <i class="fas fa-redo-alt mr-2"></i>複習錯題
+                    </button>
+                </a>
+            </div>
+
+            <div class="glass-panel p-6 rounded-3xl relative overflow-hidden group flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:scale-[1.02]">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
+                    <i class="fas fa-database text-6xl text-blue-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-2 flex items-center gap-2 text-white">
+                        <i class="fas fa-folder-open text-blue-400 text-lg"></i> 題庫總覽
+                    </h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">瀏覽、查看並練習目前系統資料庫內的所有核心題型</p>
+                </div>
+                <a href="{% url 'bank_page' %}" class="block w-full mt-4">
+                    <button class="w-full py-3 bg-slate-800 hover:bg-purple-900/40 hover:text-purple-300 rounded-xl font-bold text-sm border border-purple-500/30 active:scale-95 transition-all duration-150 cursor-pointer text-center">
+                        <i class="fas fa-arrow-right mr-1"></i> 進入題庫管理
+                    </button>
+                </a>
+            </div>
+            
+        </section>
+
+        <section class="mb-8">
+            <div class="glass-panel p-6 rounded-3xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-calendar-alt text-emerald-400"></i> 📅 過去 12 週刷題活動熱圖
+                    </h3>
+                    <div class="flex items-center gap-1.5 text-[11px] text-gray-400 font-medium">
+                        <span>少</span>
+                        <div class="w-3 h-3 rounded bg-slate-800 border border-gray-700/40"></div>
+                        <div class="w-3 h-3 rounded bg-emerald-950"></div>
+                        <div class="w-3 h-3 rounded bg-emerald-700"></div>
+                        <div class="w-3 h-3 rounded bg-emerald-500"></div>
+                        <div class="w-3 h-3 rounded bg-emerald-300"></div>
+                        <span>多</span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto pb-2">
+                    <div class="flex items-start gap-5 min-w-[760px] justify-center p-2">
+                        <div class="grid grid-rows-7 text-[10px] text-gray-500 font-mono pt-1 text-right pr-1 select-none"></div>
+                        <div class="grid grid-flow-col grid-rows-7 gap-1">
+                            {% for day in activity_list %}
+                                <div 
+                                    class="w-3.5 h-3.5 rounded-sm transition-all duration-300 cursor-pointer heatmap-cell border border-slate-900/40 hover:border-purple-400 hover:scale-110
+                                    {% if day.level == 0 %} bg-slate-800
+                                    {% elif day.level == 1 %} bg-emerald-950
+                                    {% elif day.level == 2 %} bg-emerald-700
+                                    {% elif day.level == 3 %} bg-emerald-500
+                                    {% else %} bg-emerald-300 {% endif %}"
+                                    data-tooltip="{{ day.date }} : 已完成 {{ day.count }} 次測驗"
+                                ></div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            
+            <div class="glass-panel p-8 rounded-3xl">
+                <h3 class="text-lg font-bold mb-6 flex justify-between items-center text-white">
+                    <span>📊 學習成效分析</span>
+                    <span class="text-xs text-gray-500 font-normal">最近 5 次測驗紀錄</span>
+                </h3>
+                <div class="h-64 w-full relative">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-panel p-8 rounded-3xl border border-amber-500/10 relative overflow-hidden">
+                <div class="absolute -top-6 -right-6 opacity-5">
+                    <i class="fas fa-trophy text-9xl text-amber-400"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-6 flex items-center gap-2 text-amber-400">
+                    <i class="fas fa-crown"></i> 🏆 最高分排行榜
+                </h3>
+                <div class="space-y-3">
+                    {% for player in leaderboard %}
+                    <div class="flex justify-between items-center p-3.5 rounded-xl bg-slate-800/20 border border-gray-800/40 hover:border-amber-500/30 transition-all duration-200">
+                        <div class="flex items-center gap-4">
+                            {% if forloop.counter == 1 %}
+                            <span class="w-6 h-6 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-900 flex items-center justify-center text-xs font-extrabold shadow-[0_0_12px_rgba(251,191,36,0.5)]">1</span>
+                            {% elif forloop.counter == 2 %}
+                            <span class="w-6 h-6 rounded-full bg-gradient-to-r from-slate-300 to-slate-400 text-slate-900 flex items-center justify-center text-xs font-extrabold shadow-[0_0_12px_rgba(203,213,225,0.3)]">2</span>
+                            {% elif forloop.counter == 3 %}
+                            <span class="w-6 h-6 rounded-full bg-gradient-to-r from-amber-600 to-amber-700 text-white flex items-center justify-center text-xs font-extrabold">3</span>
+                            {% else %}
+                            <span class="w-6 h-6 rounded-full bg-slate-800 border border-gray-700 text-gray-400 flex items-center justify-center text-xs font-mono">{{ forloop.counter }}</span>
+                            {% endif %}
+                            
+                            <span class="text-sm font-semibold {% if player.user__username == request.user.username %}text-purple-400 font-bold{% else %}text-gray-200{% endif %}">
+                                {{ player.user__username }}
+                                {% if player.user__username == request.user.username %}
+                                <span class="text-[10px] bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded ml-1 font-normal">你</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <span class="font-mono text-sm font-black text-amber-400">{{ player.max_score }}分</span>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-12 text-sm text-gray-500">
+                        <i class="fas fa-medal text-2xl mb-2 block opacity-40"></i>
+                        目前尚無競賽數據。
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 gap-8">
+            <div class="glass-panel p-8 rounded-3xl flex flex-col justify-between">
+                <div>
+                    <h3 class="text-lg font-bold mb-6 text-white">⏱️ 最近測驗紀錄</h3>
+                    <div class="space-y-3">
+                        {% for history in recent_histories %}
+                        <div class="flex justify-between items-center p-3 rounded-xl bg-slate-800/30 border border-gray-800/60 hover:bg-slate-800/60 transition-all duration-150">
+                            <div class="flex items-center gap-4">
+                                {% if history.status == 'PASS' %}
+                                <span class="bg-green-500/20 text-green-400 font-bold text-[10px] px-2 py-1 rounded-md tracking-wider">PASS</span>
+                                {% else %}
+                                <span class="bg-red-500/20 text-red-400 font-bold text-[10px] px-2 py-1 rounded-md tracking-wider">FAIL</span>
+                                {% endif %}
+                                <span class="text-sm font-medium text-gray-200">{{ history.title }}</span>
+                            </div>
+                            <span class="font-mono text-sm font-bold text-purple-400">{{ history.score_percentage }}%</span>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-10 text-sm text-gray-500">
+                            <i class="fas fa-inbox text-2xl mb-2 block opacity-40"></i>
+                            目前尚無測驗紀錄。
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="mt-6 border-t border-gray-800/80 pt-4 flex justify-end">
+                    <a href="{% url 'quiz_history' %}" class="text-xs text-purple-400 hover:text-purple-300 hover:underline flex items-center gap-1 transition-all">
+                        查看完整歷史紀錄庫 <i class="fas fa-chevron-right text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const chartLabels = JSON.parse('{{ labels_json|safe }}' || '[]');
+        const chartData = JSON.parse('{{ scores_json|safe }}' || '[]');
+
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        
+        const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+        gradient.addColorStop(0, 'rgba(168, 85, 247, 0.8)');  
+        gradient.addColorStop(1, 'rgba(147, 51, 234, 0.1)');  
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: '分數',
+                    data: chartData,
+                    backgroundColor: gradient,
+                    borderColor: '#A855F7',
+                    borderWidth: 2,
+                    borderRadius: 6, 
+                    borderSkipped: false,
+                    barThickness: 35 
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false } 
+                },
+                scales: {
+                    x: {
+                        grid: { display: false }, 
+                        ticks: { color: '#94A3B8', font: { size: 10 } }
+                    },
+                    y: {
+                        min: 0,
+                        max: 100, 
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' }, 
+                        ticks: { color: '#94A3B8', font: { size: 10 }, stepSize: 20 }
+                    }
+                },
+                animation: {
+                    duration: 1200,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>測驗結果</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 30px auto; padding: 20px; text-align: center; }
+        .score-box { background: #e9ecef; padding: 30px; border-radius: 10px; margin-bottom: 30px; }
+        .score { font-size: 48px; color: #dc3545; font-weight: bold; }
+        .btn-retry { display: inline-block; background: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="score-box">
+        <h1>📊 測驗結束</h1>
+        <p>你的得分是</p>
+        <div class="score">{{ score }} 分</div>
+        <p>答對題數：{{ correct_count }} / {{ total_count }} 題</p>
+    </div>
+
+    <a href="{% url 'quiz_view' %}" class="btn-retry">再測驗一次</a>
+</body>
+</html>
