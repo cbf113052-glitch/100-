@@ -26,21 +26,28 @@
 複製專案並進入資料夾
 git clone [https://github.com/cbf113052-glitch/100-.git](https://github.com/cbf113052-glitch/100-.git)
 cd mysite
-
-安裝環境必要套件（提供給教學團隊還原環境測試）
+```
+### 2. 安裝環境必要套件
+```bash
 pip install -r requirements.txt
-
-初始化與遷移資料庫（Migration）
+```
+### 3.初始化與遷移資料庫（Migration）
+```bash
 python manage.py migrate
-
-啟動本機測試伺服器
+```
+### 4.啟動本機測試伺服器
+```bash
 python manage.py runserver
-
-按下快門，正式建立本地第一個存檔紀錄
+```
+### 5.按下快門，正式建立本地第一個存檔紀錄
+```bash
 git commit -m "Initial commit - Django quiz system"
-
-確保預設分支更名為 main
+```
+### 6.確保預設分支更名為 main
+```bash
 git branch -M main
-
-正式「發射、上傳」到 GitHub 雲端網站上
+```
+### 7.正式「發射、上傳」到 GitHub 雲端網站上
+```bash
 git push origin main
+```
